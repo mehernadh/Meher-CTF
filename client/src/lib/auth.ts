@@ -18,7 +18,7 @@ interface AuthState {
 
 export const useAuth = create<AuthState>()(
   persist(
-    (set: (partial: Partial<AuthState>) => void) => ({
+    (set) => ({
       user: null,
       isAuthenticated: false,
       login: (user: User) => set({ user, isAuthenticated: true }),
