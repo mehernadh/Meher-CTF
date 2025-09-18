@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /secret-search
+Disallow: /api/
+Allow: /
+
+# THMxSFDC{r0b0ts_t3ll_s3cr3ts}
+
+# Suspicious redirect - maintenance portal
+# Visit: /secret-search for database maintenance
