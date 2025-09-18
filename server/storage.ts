@@ -57,7 +57,7 @@ export class MemStorage implements IStorage {
       id: randomUUID(),
       userId: adminId,
       secretData: "Admin access granted - all privileges enabled",
-      adminFlag: "THMxSFDC{1d0r_4dm1n_4cc3ss}",
+      adminFlag: "THMxSFDC{r3g1str10n_fl4g_f0und}",
     };
     this.adminData.set(adminId, adminDataEntry);
   }

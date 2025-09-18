@@ -71,9 +71,9 @@ export default function SecretSearch() {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center space-x-2">
             <Search className="h-6 w-6" />
-            <span>🔍 Secret Search Portal</span>
+            <span>🔍 Search Portal</span>
           </h2>
-          <p className="text-muted-foreground">Advanced database search interface</p>
+          <p className="text-muted-foreground">Advanced search interface</p>
         </div>
 
         <Card className="mb-6" data-testid="card-search-form">
@@ -82,9 +82,6 @@ export default function SecretSearch() {
               <Database className="h-5 w-5" />
               <span>Database Query Interface</span>
             </CardTitle>
-            <CardDescription>
-              Execute advanced search queries against the restaurant database
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -97,14 +94,14 @@ export default function SecretSearch() {
                       <FormLabel>Search Query</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Enter search terms... (try: ' OR 1=1 -- )" 
+                          placeholder="Enter Here..." 
                           {...field} 
                           data-testid="input-search-query"
                         />
                       </FormControl>
                       <FormMessage />
                       <p className="text-xs text-muted-foreground">
-                        Advanced syntax supported. SQL operators allowed for power users.
+                        Advanced Search.
                       </p>
                     </FormItem>
                   )}
@@ -203,20 +200,6 @@ export default function SecretSearch() {
             </CardContent>
           </Card>
         )}
-
-        <Card className="mt-6" data-testid="card-search-tips">
-          <CardHeader>
-            <CardTitle>🔍 Search Tips</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm">
-              <p>• Use wildcards (*) for broader searches</p>
-              <p>• Try advanced operators like OR, AND for complex queries</p>
-              <p>• SQL injection patterns might reveal hidden data</p>
-              <p>• Administrative queries may require special syntax</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </Layout>
   );
