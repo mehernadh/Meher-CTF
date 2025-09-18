@@ -14,9 +14,7 @@ Disallow: /api/
 Allow: /
 
 # THMxSFDC{r0b0ts_t3ll_s3cr3ts}
-
-# Suspicious redirect - maintenance portal
-# Visit: /secret-search for database maintenance`;
+`;
     
     res.set("Content-Type", "text/plain");
     res.send(robotsContent);
