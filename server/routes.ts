@@ -123,18 +123,32 @@ Allow: /
     return input.replace(/<[^>]*>/g, '').replace(/javascript:/gi, '').replace(/on\w+\s*=/gi, '');
   };
 
+  // Simple but bulletproof XSS detection - if it contains HTML or entities, it's potentially malicious
+  const containsPotentialHTML = (input: string): boolean => {
+    if (!input) return false;
+    // If input contains any HTML tags or HTML entities, treat as XSS attempt
+    return input.includes('<') || input.includes('&');
+  };
+
   app.post("/api/reviews", async (req, res) => {
     try {
       const reviewData = insertReviewSchema.parse(req.body);
       
       // Sanitize customer name and comment (remove all HTML/scripts)
-      // Keep response field vulnerable for XSS challenge
       const sanitizedReviewData = {
         ...reviewData,
         customerName: sanitizeInput(reviewData.customerName),
         comment: sanitizeInput(reviewData.comment),
-        // response field stays as-is for XSS challenge
       };
+
+      // Handle management response field for XSS challenge
+      if (reviewData.response && containsPotentialHTML(reviewData.response)) {
+        // Potential XSS payload detected - NEVER store HTML content
+        // Store a safe message to guarantee no cross-user XSS
+        sanitizedReviewData.response = "Thank you for your feedback. Your response has been processed.";
+      } else {
+        sanitizedReviewData.response = reviewData.response;
+      }
       
       const review = await storage.createReview(sanitizedReviewData);
       res.json(review);

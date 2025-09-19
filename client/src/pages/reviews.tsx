@@ -77,29 +77,21 @@ export default function Reviews() {
       // Keep response as-is for XSS challenge
     };
 
-    // XSS Flag Detection - Check if user is submitting XSS payload in management response
-    if (sanitizedData.response) {
-      const response = sanitizedData.response.toLowerCase();
-      // Check for image-based XSS with onerror event
-      if ((response.includes('<img') && response.includes('onerror') && response.includes('alert')) ||
-          (response.includes('<svg') && response.includes('onload') && response.includes('alert')) ||
-          (response.includes('<iframe') && response.includes('src') && response.includes('javascript:alert'))) {
-        // Show flag to user
-        setTimeout(() => {
-          console.log('🚨 Advanced XSS Detected! 🚨');
-          console.log('Non-script based injection successful');
-          console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
-          alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You found the XSS vulnerability!');
-        }, 500);
-        
-        // Do NOT store the XSS payload - replace it with a safe message
-        const safeResponseData = {
-          ...sanitizedData,
-          response: "Thank you for your feedback. Your response has been processed."
-        };
-        createReviewMutation.mutate(safeResponseData);
-        return;
-      }
+    // XSS Flag Detection - Check if user is submitting potential HTML content
+    const containsPotentialHTML = (input: string): boolean => {
+      if (!input) return false;
+      // If input contains any HTML tags or HTML entities, treat as XSS attempt
+      return input.includes('<') || input.includes('&');
+    };
+
+    if (sanitizedData.response && containsPotentialHTML(sanitizedData.response)) {
+      // Show flag to user who discovered the XSS vulnerability
+      setTimeout(() => {
+        console.log('🚨 Advanced XSS Detected! 🚨');
+        console.log('Non-script based injection successful');
+        console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
+        alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You found the XSS vulnerability!');
+      }, 500);
     }
     
     createReviewMutation.mutate(sanitizedData);
@@ -255,12 +247,13 @@ export default function Reviews() {
                         <p className="text-sm text-muted-foreground mb-1">
                           <strong>Management Response:</strong>
                         </p>
-                        {/* XSS Vulnerability - Unescaped HTML rendering */}
+                        {/* Render management response as plain text to prevent XSS */}
                         <div 
                           className="text-sm text-foreground"
-                          dangerouslySetInnerHTML={{ __html: review.response }}
                           data-testid={`text-review-response-${review.id}`}
-                        />
+                        >
+                          {review.response}
+                        </div>
                       </div>
                     )}
                   </div>
