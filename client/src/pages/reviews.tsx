@@ -225,6 +225,17 @@ export default function Reviews() {
                           className="text-sm text-foreground"
                           dangerouslySetInnerHTML={{ __html: review.response }}
                           data-testid={`text-review-response-${review.id}`}
+                          ref={(element) => {
+                            // XSS Flag Detection
+                            if (element && review.response && review.response.toLowerCase().includes('<script')) {
+                              setTimeout(() => {
+                                console.log('🚨 XSS Vulnerability Detected! 🚨');
+                                console.log('Script injection successful in review response');
+                                console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
+                                alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You successfully exploited the XSS vulnerability in the comments section.');
+                              }, 100);
+                            }
+                          }}
                         />
                       </div>
                     )}

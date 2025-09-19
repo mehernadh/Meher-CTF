@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/auth';
 import { 
   LayoutDashboard, 
   Receipt, 
@@ -35,6 +36,7 @@ const adminItems = [
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location] = useLocation();
+  const { user } = useAuth();
 
   return (
     <>
@@ -74,33 +76,38 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               );
             })}
             
-            <div className="border-t border-border my-4" />
-            
-            {adminItems.map((item) => {
-              if (item.hidden && !window.location.hash.includes('secret')) {
-                return null;
-              }
-              
-              const isActive = location === item.href;
-              const Icon = item.icon;
-              
-              return (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={isActive ? "secondary" : "ghost"}
-                    className={cn(
-                      "w-full justify-start",
-                      isActive && "bg-muted text-primary"
-                    )}
-                    onClick={() => onClose()}
-                    data-testid={`nav-link-${item.label.toLowerCase().replace(' ', '-')}`}
-                  >
-                    <Icon className="h-4 w-4 mr-3" />
-                    {item.label}
-                  </Button>
-                </Link>
-              );
-            })}
+            {/* Only show admin section if user is admin */}
+            {user?.isAdmin && (
+              <>
+                <div className="border-t border-border my-4" />
+                
+                {adminItems.map((item) => {
+                  if (item.hidden && !window.location.hash.includes('secret')) {
+                    return null;
+                  }
+                  
+                  const isActive = location === item.href;
+                  const Icon = item.icon;
+                  
+                  return (
+                    <Link key={item.href} href={item.href}>
+                      <Button
+                        variant={isActive ? "secondary" : "ghost"}
+                        className={cn(
+                          "w-full justify-start",
+                          isActive && "bg-muted text-primary"
+                        )}
+                        onClick={() => onClose()}
+                        data-testid={`nav-link-${item.label.toLowerCase().replace(' ', '-')}`}
+                      >
+                        <Icon className="h-4 w-4 mr-3" />
+                        {item.label}
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
           
           <div className="p-4 border-t border-border">
