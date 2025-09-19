@@ -118,11 +118,25 @@ Allow: /
     res.json(reviews);
   });
 
+  // Helper function to sanitize customer input (remove HTML/scripts)
+  const sanitizeInput = (input: string): string => {
+    return input.replace(/<[^>]*>/g, '').replace(/javascript:/gi, '').replace(/on\w+\s*=/gi, '');
+  };
+
   app.post("/api/reviews", async (req, res) => {
     try {
-      // Intentionally vulnerable - no input sanitization for XSS
       const reviewData = insertReviewSchema.parse(req.body);
-      const review = await storage.createReview(reviewData);
+      
+      // Sanitize customer name and comment (remove all HTML/scripts)
+      // Keep response field vulnerable for XSS challenge
+      const sanitizedReviewData = {
+        ...reviewData,
+        customerName: sanitizeInput(reviewData.customerName),
+        comment: sanitizeInput(reviewData.comment),
+        // response field stays as-is for XSS challenge
+      };
+      
+      const review = await storage.createReview(sanitizedReviewData);
       res.json(review);
     } catch (error) {
       res.status(400).json({ message: "Invalid review data", error });

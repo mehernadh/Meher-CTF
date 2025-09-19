@@ -63,10 +63,23 @@ export default function Reviews() {
     },
   });
 
+  // Sanitize customer input fields (remove all HTML/scripts)
+  const sanitizeInput = (input: string): string => {
+    return input.replace(/<[^>]*>/g, '').replace(/javascript:/gi, '').replace(/on\w+\s*=/gi, '');
+  };
+
   const onSubmit = (data: ReviewResponseForm) => {
-    // XSS Flag Detection - Check if user is submitting XSS payload
-    if (data.response) {
-      const response = data.response.toLowerCase();
+    // Sanitize customer name and comment (remove all HTML/scripts)
+    const sanitizedData = {
+      ...data,
+      customerName: sanitizeInput(data.customerName),
+      comment: sanitizeInput(data.comment),
+      // Keep response as-is for XSS challenge
+    };
+
+    // XSS Flag Detection - Check if user is submitting XSS payload in management response
+    if (sanitizedData.response) {
+      const response = sanitizedData.response.toLowerCase();
       // Check for image-based XSS with onerror event
       if ((response.includes('<img') && response.includes('onerror') && response.includes('alert')) ||
           (response.includes('<svg') && response.includes('onload') && response.includes('alert')) ||
@@ -80,16 +93,16 @@ export default function Reviews() {
         }, 500);
         
         // Do NOT store the XSS payload - replace it with a safe message
-        const safeData = {
-          ...data,
+        const safeResponseData = {
+          ...sanitizedData,
           response: "Thank you for your feedback. Your response has been processed."
         };
-        createReviewMutation.mutate(safeData);
+        createReviewMutation.mutate(safeResponseData);
         return;
       }
     }
     
-    createReviewMutation.mutate(data);
+    createReviewMutation.mutate(sanitizedData);
   };
 
   const renderStars = (rating: number) => {
