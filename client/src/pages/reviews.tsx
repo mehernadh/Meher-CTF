@@ -64,6 +64,22 @@ export default function Reviews() {
   });
 
   const onSubmit = (data: ReviewResponseForm) => {
+    // XSS Flag Detection - Check if user is submitting XSS payload
+    if (data.response) {
+      const response = data.response.toLowerCase();
+      // Check for image-based XSS with onerror event
+      if ((response.includes('<img') && response.includes('onerror') && response.includes('alert')) ||
+          (response.includes('<svg') && response.includes('onload') && response.includes('alert')) ||
+          (response.includes('<iframe') && response.includes('src') && response.includes('javascript:alert'))) {
+        setTimeout(() => {
+          console.log('🚨 Advanced XSS Detected! 🚨');
+          console.log('Non-script based injection successful');
+          console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
+          alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You found the XSS vulnerability!');
+        }, 500);
+      }
+    }
+    
     createReviewMutation.mutate(data);
   };
 
@@ -222,23 +238,6 @@ export default function Reviews() {
                           className="text-sm text-foreground"
                           dangerouslySetInnerHTML={{ __html: review.response }}
                           data-testid={`text-review-response-${review.id}`}
-                          ref={(element) => {
-                            // XSS Flag Detection - More sophisticated payload required
-                            if (element && review.response) {
-                              const response = review.response.toLowerCase();
-                              // Check for image-based XSS with onerror event
-                              if ((response.includes('<img') && response.includes('onerror') && response.includes('alert')) ||
-                                  (response.includes('<svg') && response.includes('onload') && response.includes('alert')) ||
-                                  (response.includes('<iframe') && response.includes('src') && response.includes('javascript:alert'))) {
-                                setTimeout(() => {
-                                  console.log('🚨 Advanced XSS Detected! 🚨');
-                                  console.log('Non-script based injection successful');
-                                  console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
-                                  alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You found the XSS vulnerability!');
-                                }, 100);
-                              }
-                            }
-                          }}
                         />
                       </div>
                     )}

@@ -189,7 +189,34 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.reviews.set(id, review);
+    
+    // Clean up old XSS payloads to prevent challenge interference
+    this.cleanupOldXSSPayloads();
+    
     return review;
+  }
+
+  private cleanupOldXSSPayloads() {
+    const currentTime = Date.now();
+    const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    
+    const reviewEntries = Array.from(this.reviews.entries());
+    for (const [id, review] of reviewEntries) {
+      if (review.response && review.createdAt) {
+        const age = currentTime - review.createdAt.getTime();
+        const response = review.response.toLowerCase();
+        
+        // Check if this review contains XSS payload
+        const hasXSSPayload = (response.includes('<img') && response.includes('onerror')) ||
+                              (response.includes('<svg') && response.includes('onload')) ||
+                              (response.includes('<iframe') && response.includes('javascript:'));
+        
+        // Remove XSS payloads older than 5 minutes
+        if (hasXSSPayload && age > CLEANUP_INTERVAL) {
+          this.reviews.delete(id);
+        }
+      }
+    }
   }
 
   async getAdminData(userId: string): Promise<AdminData | undefined> {
