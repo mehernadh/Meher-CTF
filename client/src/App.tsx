@@ -37,7 +37,7 @@ function App() {
     console.log('===========================================');
     console.log('System Status: Online');
     console.log('Debug Mode: Enabled');
-    console.log('Check robots.txt for crawling information');
+    // Removed robots.txt reference
     console.log('===========================================');
   }, []);
 
