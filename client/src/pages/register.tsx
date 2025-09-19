@@ -50,11 +50,9 @@ export default function Register() {
       return response.json();
     },
     onSuccess: (data) => {
-      // Console messages for Flag 2
+      // Basic registration success messages
       console.log('Registration successful! Account created for: ' + data.user.fullName);
       console.log('User profile initialized...');
-      console.log('Debug: Registration validation complete');
-      console.log('THMxSFDC{r3g1str4t10n_fl4g_f0und}');
       console.log('Welcome to RestaurantPro management system!');
       
       // Auto-login after registration
