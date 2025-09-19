@@ -160,16 +160,13 @@ export default function Reviews() {
                       <FormLabel>Management Response</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Enter your response... (HTML supported)" 
+                          placeholder="Enter your response to the customer..." 
                           className="h-24"
                           {...field} 
                           data-testid="textarea-response"
                         />
                       </FormControl>
                       <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        Tip: You can use HTML tags like &lt;script&gt; for dynamic content
-                      </p>
                     </FormItem>
                   )}
                 />
@@ -226,14 +223,20 @@ export default function Reviews() {
                           dangerouslySetInnerHTML={{ __html: review.response }}
                           data-testid={`text-review-response-${review.id}`}
                           ref={(element) => {
-                            // XSS Flag Detection
-                            if (element && review.response && review.response.toLowerCase().includes('<script')) {
-                              setTimeout(() => {
-                                console.log('🚨 XSS Vulnerability Detected! 🚨');
-                                console.log('Script injection successful in review response');
-                                console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
-                                alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You successfully exploited the XSS vulnerability in the comments section.');
-                              }, 100);
+                            // XSS Flag Detection - More sophisticated payload required
+                            if (element && review.response) {
+                              const response = review.response.toLowerCase();
+                              // Check for image-based XSS with onerror event
+                              if ((response.includes('<img') && response.includes('onerror') && response.includes('alert')) ||
+                                  (response.includes('<svg') && response.includes('onload') && response.includes('alert')) ||
+                                  (response.includes('<iframe') && response.includes('src') && response.includes('javascript:alert'))) {
+                                setTimeout(() => {
+                                  console.log('🚨 Advanced XSS Detected! 🚨');
+                                  console.log('Non-script based injection successful');
+                                  console.log('Flag: THMxSFDC{xss_c0mm3nt_h4ck}');
+                                  alert('XSS Flag Found!\n\nFlag: THMxSFDC{xss_c0mm3nt_h4ck}\n\nCongratulations! You found the XSS vulnerability!');
+                                }, 100);
+                              }
                             }
                           }}
                         />
