@@ -14,10 +14,12 @@ export default function Admin() {
     queryKey: ['/api/users'],
   });
 
-  // IDOR vulnerability - allows accessing any user by ID
+  // IDOR vulnerability - allows accessing any user profile by encoded reference
   const handleViewUserDetails = async (userId: string) => {
     try {
-      const response = await apiRequest('GET', `/api/admin/${userId}`);
+      // Encode user ID for "security" (actually makes it more exploitable)
+      const encodedUserId = Buffer.from(userId).toString('base64');
+      const response = await apiRequest('GET', `/api/user/profile/${encodedUserId}`);
       const userData = await response.json();
       
       if (userData.flag) {
@@ -29,12 +31,13 @@ export default function Admin() {
         // Show detailed admin data
         alert(`Admin Access Granted!\n\nUser Details:\nID: ${userData.id}\nName: ${userData.name}\nEmail: ${userData.email}\nRole: ${userData.role}\n\nSecurity Token: ${userData.flag}\n\nLast Login: ${userData.lastLogin}`);
         
-        console.log('IDOR Vulnerability Exploited!');
-        console.log('Admin data accessed:', userData);
+        console.log('IDOR Profile Access Vulnerability Exploited!');
+        console.log('Admin profile accessed:', userData);
+        console.log('Hint: Try encoding different user identifiers in base64...');
       } else {
         toast({
           title: 'Access Denied',
-          description: userData.message || 'User details not found',
+          description: userData.message || 'Profile access restricted',
           variant: 'destructive',
         });
       }

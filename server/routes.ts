@@ -62,20 +62,28 @@ Allow: /
     }
   });
 
-  // IDOR Vulnerability - Admin endpoint (Flag 3)
-  app.get("/api/admin/:userId", async (req, res) => {
-    const { userId } = req.params;
+  // IDOR Vulnerability - User profile endpoint (Flag 3)
+  app.get("/api/user/profile/:userRef", async (req, res) => {
+    const { userRef } = req.params;
     
     // Intentionally vulnerable - no authorization check
+    // Decode the user reference (simple base64)
+    let userId;
+    try {
+      userId = Buffer.from(userRef, 'base64').toString('ascii');
+    } catch {
+      return res.status(400).json({ message: "Invalid user reference" });
+    }
+    
     const user = await storage.getUser(userId);
     const adminData = await storage.getAdminData(userId);
     
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User profile not found" });
     }
 
-    // If accessing admin user (ID: 1), return flag
-    if (userId === "1" && adminData) {
+    // If accessing admin user (encoded ID: YWRtaW5fdXNlcl8yMDI0), return flag
+    if (userId === "admin_user_2024" && adminData) {
       return res.json({
         id: user.id,
         name: user.fullName,
@@ -84,7 +92,8 @@ Allow: /
         permissions: ["all"],
         flag: adminData.adminFlag,
         lastLogin: "2024-01-15 09:30:00",
-        secretData: adminData.secretData
+        secretData: adminData.secretData,
+        profileAccess: "elevated"
       });
     }
 
@@ -93,7 +102,7 @@ Allow: /
       name: user.fullName,
       email: user.email,
       role: user.role,
-      message: "Access denied - insufficient privileges"
+      message: "Standard profile access"
     });
   });
 

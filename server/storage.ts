@@ -39,7 +39,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeAdminUser() {
-    const adminId = "1";
+    // Hidden admin user with obfuscated ID
+    const adminId = "admin_user_2024";
     const admin: User = {
       id: adminId,
       username: "admin",
@@ -51,8 +52,22 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.users.set(adminId, admin);
+    
+    // Also create a decoy admin with ID "1" for misdirection
+    const decoyId = "1";
+    const decoyAdmin: User = {
+      id: decoyId,
+      username: "administrator",
+      email: "administrator@restaurant.com",
+      password: "password123",
+      fullName: "System Administrator",
+      role: "admin",
+      isAdmin: true,
+      createdAt: new Date(),
+    };
+    this.users.set(decoyId, decoyAdmin);
 
-    // Create admin data with flag
+    // Create admin data with flag for real admin
     const adminDataEntry: AdminData = {
       id: randomUUID(),
       userId: adminId,
@@ -60,6 +75,15 @@ export class MemStorage implements IStorage {
       adminFlag: "THMxSFDC{1d0r_4dm1n_4cc3ss}",
     };
     this.adminData.set(adminId, adminDataEntry);
+    
+    // Create fake admin data for decoy (no flag)
+    const decoyDataEntry: AdminData = {
+      id: randomUUID(),
+      userId: decoyId,
+      secretData: "Limited administrative access",
+      adminFlag: null,
+    };
+    this.adminData.set(decoyId, decoyDataEntry);
   }
 
   private initializeSampleData() {
